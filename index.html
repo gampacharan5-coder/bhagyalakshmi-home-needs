@@ -781,41 +781,53 @@
         @media (max-width: 768px) {
             header {
                 flex-direction: row;
-                /* Keep logo and hamburger on same line */
-                flex-wrap: wrap;
-                /* Allow links to drop below */
-                padding: 15px 20px;
-                gap: 15px;
+                flex-wrap: nowrap;
+                /* Force them to stay on one line */
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px;
                 position: relative;
-                /* Keep header stuck to top */
                 position: sticky;
                 top: 0;
             }
 
             .logo {
+                font-size: 18px;
+                /* Specifically shrunk so 'Bhagyalakshmi' fits on phones */
                 flex-grow: 1;
+                white-space: normal;
+                /* Allow wrapping if absolutely necessary, but strictly within its bounds */
+                line-height: 1.2;
             }
 
             .menu-toggle {
                 display: block;
-                /* Show hamburger on mobile */
+                padding: 10px;
+                /* Bigger tap target for the hamburger */
+                background-color: #f9f9f9;
+                border-radius: 4px;
             }
 
             .nav-links {
                 display: none;
-                /* Hide absolutely everything in nav links by default */
                 flex-direction: column;
                 width: 100%;
                 gap: 5px;
-                /* Tighter gap between massive buttons */
                 background-color: #fff;
                 padding-bottom: 20px;
-                margin-top: 10px;
+                margin-top: 15px;
+                /* Push it definitely below the header row */
+                position: absolute;
+                /* Absolute positioning so it drops DOWN over the hero */
+                top: 100%;
+                left: 0;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                /* Give dropdown a shadow */
+                z-index: 1000;
             }
 
             .nav-links.active {
                 display: flex;
-                /* Show when toggled via JS */
             }
 
             .nav-links>li {
@@ -827,7 +839,6 @@
             .nav-links>li>a {
                 display: block;
                 padding: 15px;
-                /* Huge tap targets */
                 font-size: 16px;
                 font-weight: 500;
             }
@@ -865,7 +876,6 @@
             .nav-search-container {
                 width: 100%;
                 padding: 15px 20px;
-                /* Big padding for search area */
                 justify-content: center;
             }
 
@@ -873,9 +883,7 @@
                 width: 100%;
                 max-width: 350px;
                 padding: 12px 15px 12px 40px;
-                /* Huge text box */
                 font-size: 16px;
-                /* Prevents iOS auto-zoom */
                 border-radius: 25px;
             }
 
@@ -886,7 +894,6 @@
             .nav-search-icon {
                 left: auto;
                 transform: translateX(-150px);
-                /* Adjust icon into new huge search bar */
             }
 
             .search-results-dropdown {
@@ -896,37 +903,57 @@
             }
 
             .hero {
-                padding: 40px 20px;
+                padding: 60px 20px 40px 20px;
+                /* Huge top padding so absolute header doesn't cover it */
+                min-height: 50vh;
+                /* Give hero room to breathe */
             }
 
             .hero h1 {
-                font-size: 28px;
+                font-size: 32px;
+                /* Re-adjusted hero size */
+                line-height: 1.3;
+                margin-bottom: 15px;
+            }
+
+            .hero p {
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 25px;
+            }
+
+            .hero a.cta-button {
+                padding: 12px 24px;
+                font-size: 16px;
             }
 
             .scrolling-wrapper {
-                height: 150px;
+                height: 120px;
             }
 
             .scroll-img {
-                width: 200px;
-                height: 150px;
+                width: 180px;
+                height: 120px;
             }
 
             .features {
                 flex-direction: column;
-                padding: 20px;
-                gap: 20px;
+                padding: 30px;
+                gap: 30px;
+            }
+
+            .feature-card {
+                padding: 25px;
             }
 
             .products-section {
-                padding: 20px 10px;
+                padding: 40px 15px;
             }
 
             .product-grid {
                 grid-template-columns: 1fr;
-                /* Single column layout for phones */
-                gap: 20px;
-                padding: 0 15px;
+                gap: 25px;
+                padding: 0 10px;
             }
 
             .chat-window {
