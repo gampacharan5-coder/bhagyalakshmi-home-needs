@@ -8,6 +8,8 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: #f4f6f9;
     color: #333;
+    overflow-x: hidden;
+    /* Guarantee no horizontal scroll on mobile */
 }
 
 /* Modal Login */
@@ -284,6 +286,15 @@ body {
     background-color: #1976D2;
 }
 
+.full-width-card {
+    grid-column: 1 / -1;
+}
+
+.split-columns {
+    display: flex;
+    gap: 40px;
+}
+
 @media (max-width: 900px) {
     .dashboard-content {
         grid-template-columns: 1fr;
@@ -307,10 +318,10 @@ body {
         width: 100%;
     }
 
-    /* Target the inline flex divs used for layout like slider and hardcoded items */
-    section>div[style*="display: flex"] {
-        flex-direction: column !important;
-        gap: 20px !important;
+    /* Stack the split columns */
+    .split-columns {
+        flex-direction: column;
+        gap: 20px;
     }
 
     .custom-product-item {
@@ -351,8 +362,10 @@ body {
     }
 
     .add-product-section,
-    .manage-inventory-section {
+    .manage-inventory-section,
+    .custom-admin-card {
         padding: 15px;
+        /* Free up width by shrinking card borders */
     }
 
     .admin-header h1 {
