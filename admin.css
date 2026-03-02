@@ -251,5 +251,45 @@ body {
 @media (max-width: 900px) {
     .dashboard-content {
         grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 15px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+        /* Let form-group margins handle it */
+    }
+
+    .form-group.half {
+        width: 100%;
+    }
+
+    /* Target the inline flex divs used for layout like slider and hardcoded items */
+    section>div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 20px !important;
+    }
+
+    .custom-product-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .custom-product-item img {
+        margin-right: 0;
+    }
+
+    .toggle-visibility-btn,
+    .delete-btn {
+        margin-right: 0;
+        width: 100%;
     }
 }
