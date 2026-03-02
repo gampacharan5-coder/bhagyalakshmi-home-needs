@@ -932,9 +932,9 @@
             }
 
             #hero h1 {
-                font-size: clamp(25px, 10vw, 34px);
-                /* Dynamically shrinks to fit the narrowest screens */
-                line-height: 1.2;
+                font-size: clamp(30px, 12vw, 42px);
+                /* Increased significantly for mobile */
+                line-height: 1.1;
                 margin-bottom: 12px;
                 word-wrap: break-word;
                 overflow-wrap: break-word;
@@ -942,28 +942,40 @@
             }
 
             #hero p {
-                font-size: 15px;
+                font-size: 16px;
                 line-height: 1.5;
                 margin-bottom: 20px;
             }
 
             #hero a.btn {
-                padding: 10px 20px;
-                font-size: 15px;
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+
+            .hero-overlay {
+                background: rgba(0, 0, 0, 0.4);
+                /* Make background clearer */
             }
 
             .scrolling-wrapper {
                 height: 100%;
-                /* Fill the hero background */
+                align-items: stretch;
+                /* Force children to stretch vertically */
+            }
+
+            .scrolling-track {
+                height: 100%;
+                align-items: stretch;
             }
 
             .scroll-img {
-                width: 60vw;
+                width: 75vw;
                 height: 100%;
                 padding: 0;
-                /* Remove inherited desktop padding */
                 border-radius: 0;
-                /* Remove borders so it looks like a seamless background */
+                opacity: 0.85;
+                /* Make images clearer */
+                object-fit: cover;
             }
 
             .features {
