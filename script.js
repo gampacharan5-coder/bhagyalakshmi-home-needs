@@ -10,10 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
             navLinks.classList.toggle('active');
         });
 
-        // Close menu when clicking a link
+        // Close menu when clicking a link, or toggle submenus
         navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
+            link.addEventListener('click', (e) => {
+                if (link.getAttribute('href') === 'javascript:void(0);') {
+                    // Mobile submenu accordion
+                    const dropdown = link.nextElementSibling;
+                    if (dropdown) {
+                        dropdown.classList.toggle('mobile-open');
+                    }
+                } else {
+                    navLinks.classList.remove('active');
+                }
             });
         });
     }

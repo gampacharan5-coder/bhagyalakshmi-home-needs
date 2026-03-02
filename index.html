@@ -817,6 +817,10 @@
                 /* Hide absolutely everything in nav links by default */
                 flex-direction: column;
                 width: 100%;
+                max-height: 80vh;
+                /* Allow scrolling */
+                overflow-y: auto;
+                overflow-x: hidden;
                 gap: 5px;
                 background-color: #fff;
                 padding-bottom: 20px;
@@ -841,7 +845,8 @@
             .nav-links>li>a {
                 display: block;
                 padding: 15px;
-                font-size: 16px;
+                font-size: 18px;
+                /* Increased Home tab size */
                 font-weight: 500;
             }
 
@@ -852,16 +857,19 @@
                 border: none;
                 max-height: none;
                 background-color: #fcfcfc;
-                visibility: visible;
-                /* Override desktop hover hiding */
-                opacity: 1;
+                display: none;
+                /* Hide accordion by default */
+            }
+
+            .dropdown-content.mobile-open {
                 display: block;
             }
 
             .dropdown-submenu>a {
                 display: block;
                 padding: 12px;
-                font-size: 15px;
+                font-size: 16px;
+                /* slightly larger */
                 border-bottom: 1px solid #f5f5f5;
             }
 
@@ -871,9 +879,11 @@
                 box-shadow: none;
                 background-color: #f5f5f5;
                 padding: 5px 0;
-                visibility: visible;
-                /* Make all submenu links visible on mobile */
-                opacity: 1;
+                display: none;
+                /* Hide accordion by default */
+            }
+
+            .dropdown-submenu-content.mobile-open {
                 display: block;
             }
 
