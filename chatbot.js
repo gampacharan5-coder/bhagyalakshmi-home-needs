@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Simulate AI Store Assistant
     let lastSearchTerms = [];
 
-    
+
     let globalProductCards = [];
     async function getProductCards() {
         if (globalProductCards.length > 0) return globalProductCards;
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (maxBudget !== Infinity) response += ` under ₹${maxBudget}`;
             response += ":<br><br>";
 
-            
+
             const isAllProductsPage = window.location.pathname.includes('all-products.html');
             const basePath = isAllProductsPage ? '' : 'all-products.html';
 
@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatInput.value = '';
 
         // Simulate thinking delay then add bot response
-        setTimeout(() => {
+        setTimeout(async () => {
             const botReply = await getBotResponse(text);
             addMessage(botReply, 'bot');
         }, 600 + Math.random() * 600);
