@@ -1,4 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
+const initChatbot = () => {
+    if (document.querySelector('.chat-widget')) return; // Prevent duplicate injection
+
     const chatHTML = `
 <!-- Chatbot UI Widget -->
     <div class="chat-widget">
@@ -41,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
     const chatMessages = document.getElementById('chatMessages');
+
+    if (!chatButton || !chatWindow) return;
 
     // Toggle chat window
     chatButton.addEventListener('click', () => {
@@ -288,4 +292,12 @@ document.addEventListener("DOMContentLoaded", () => {
             handleSend();
         }
     });
-});
+};
+
+// Robust initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatbot);
+} else {
+    initChatbot();
+}
+
