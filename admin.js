@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('customStoreProducts', JSON.stringify(products));
 
         const successMsg = document.getElementById('success-msg');
+        successMsg.innerHTML = 'Product added <strong>locally</strong> to this browser! To make it permanent for all users, please contact the developer.';
         successMsg.style.display = 'block';
 
         form.reset();
