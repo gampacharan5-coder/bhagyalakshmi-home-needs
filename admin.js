@@ -215,30 +215,83 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Custom Category / Navigation Menu Logic ---
     const categoryForm = document.getElementById('category-form');
+    const categorySubmitBtn = document.getElementById('category-submit-btn');
+    const cancelEditCatBtn = document.getElementById('cancel-edit-category-btn');
+    const editCatIdInput = document.getElementById('edit-category-id');
+
+    // Attach to window so it can be called by inline onclick
+    window.editCategory = async function (id) {
+        const categories = await Database.getCustomCategories();
+        const cat = categories.find(c => c.id === id);
+        if (!cat) return;
+
+        // Populate fields
+        editCatIdInput.value = cat.id;
+        document.getElementById('new-menu-name').value = cat.menuName || '';
+        document.getElementById('new-brand-name').value = cat.brandName || '';
+
+        // UI Changes for edit mode
+        categorySubmitBtn.textContent = 'Update Navigation Menu';
+        categorySubmitBtn.style.backgroundColor = '#ff9800'; // Orange for edit
+        cancelEditCatBtn.style.display = 'block';
+        document.querySelector('.add-category-section h3:last-of-type').textContent = 'Edit Menu';
+
+        // Scroll to form
+        categoryForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    function resetCategoryForm() {
+        categoryForm.reset();
+        editCatIdInput.value = '';
+        categorySubmitBtn.textContent = 'Add to Navigation Menu';
+        categorySubmitBtn.style.backgroundColor = '#4caf50'; // Back to green
+        cancelEditCatBtn.style.display = 'none';
+        document.querySelector('.add-category-section h3:last-of-type').textContent = 'Create New Menu';
+    }
+
+    cancelEditCatBtn.addEventListener('click', resetCategoryForm);
 
     categoryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const menuName = document.getElementById('new-menu-name').value.trim();
         const brandName = document.getElementById('new-brand-name').value.trim();
+        const editId = editCatIdInput.value;
 
-        const menuSlug = menuName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const brandSlug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const categoryId = `${menuSlug}-${brandSlug}`;
+        let categoryId;
+        let dateAdded = new Date().toISOString();
 
-        const newCategory = {
+        if (editId) {
+            // We are editing, so we PRESERVE the existing ID so product connections don't break
+            categoryId = editId;
+            // Optionally preserve original date (fetch existing logic)
+            const cats = await Database.getCustomCategories();
+            const existingCat = cats.find(c => c.id === editId);
+            if (existingCat && existingCat.dateAdded) {
+                dateAdded = existingCat.dateAdded;
+            }
+        } else {
+            // New Category, generate ID from slugs
+            const menuSlug = menuName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const brandSlug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            categoryId = `${menuSlug}-${brandSlug}`;
+        }
+
+        const categoryData = {
             id: categoryId,
             menuName: menuName,
             brandName: brandName,
             displayName: `${menuName} > ${brandName}`,
-            dateAdded: new Date().toISOString()
+            dateAdded: dateAdded,
+            lastUpdated: new Date().toISOString()
         };
 
-        await Database.saveCustomCategory(newCategory);
+        await Database.saveCustomCategory(categoryData);
 
         const catSuccessMsg = document.getElementById('cat-success-msg');
+        catSuccessMsg.textContent = editId ? 'Menu updated successfully!' : 'Menu added successfully!';
         catSuccessMsg.style.display = 'block';
-        categoryForm.reset();
+        resetCategoryForm();
 
         await loadCustomCategories();
 
@@ -292,7 +345,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h4 style="margin:0;">${c.displayName}</h4>
                     <p style="margin:0; font-size:12px; color:#888;">ID: ${c.id}</p>
                 </div>
-                <button class="delete-btn" onclick="deleteCategory('${c.id}')">Remove Menu</button>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <button class="submit-btn" style="background-color: #2196F3; font-weight: normal; font-size: 14px; padding: 5px 10px; width: 100px;" onclick="editCategory('${c.id}')">Edit</button>
+                    <button class="delete-btn" style="font-weight: normal; font-size: 14px; padding: 5px 10px; width: 100px;" onclick="deleteCategory('${c.id}')">Remove</button>
+                </div>
             `;
             catList.appendChild(item);
         });

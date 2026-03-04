@@ -112,6 +112,7 @@
                         <div class="custom-admin-card" style="margin-top: 0;">
                             <h3 style="margin-bottom: 15px; color: #2196F3;">Create New Menu</h3>
                             <form id="category-form" class="product-form">
+                                <input type="hidden" id="edit-category-id">
                                 <div class="form-row">
                                     <div class="form-group half">
                                         <label for="new-menu-name">Main Menu (e.g. Heaters)</label>
@@ -122,8 +123,13 @@
                                         <input type="text" id="new-brand-name" required placeholder="Company Name">
                                     </div>
                                 </div>
-                                <button type="submit" class="submit-btn add-menu-btn" style="margin-top: 10px;">Add to
-                                    Navigation Menu</button>
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button type="submit" id="category-submit-btn" class="submit-btn add-menu-btn"
+                                        style="flex: 1; margin: 0;">Add to Navigation Menu</button>
+                                    <button type="button" id="cancel-edit-category-btn" class="cancel-btn"
+                                        style="display: none; width: auto; padding: 10px 20px;">Cancel Edit</button>
+                                </div>
+
                                 <p id="cat-success-msg"
                                     style="color: green; display: none; margin-top: 10px; font-weight: bold;">
                                     Menu added successfully!</p>
