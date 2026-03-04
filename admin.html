@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- Using the same core font as index.html -->
-    <link rel="stylesheet" href="admin.css?v=2.2">
+    <link rel="stylesheet" href="admin.css?v=2.6">
 </head>
 
 <body>
@@ -47,44 +47,6 @@
                             <label for="prod-category">Category</label>
                             <select id="prod-category" required>
                                 <option value="" disabled selected>Select a Product Category</option>
-                                <optgroup label="Mixer">
-                                    <option value="mixers-preethi">Preethi</option>
-                                    <option value="mixers-prestige">Prestige</option>
-                                    <option value="mixers-ultra">Ultra</option>
-                                    <option value="mixers-ganga">Ganga</option>
-                                    <option value="mixers-electron">Electron</option>
-                                </optgroup>
-                                <optgroup label="Grinder">
-                                    <option value="grinders-ultra">Ultra</option>
-                                    <option value="grinders-prestige">Prestige</option>
-                                    <option value="grinders-preethi">Preethi</option>
-                                    <option value="grinders-lakshmi">Lakshmi</option>
-                                </optgroup>
-                                <optgroup label="Cookers">
-                                    <option value="cookers-prestige">Prestige</option>
-                                    <option value="cookers-butterfly">Butterfly</option>
-                                    <option value="cookers-ganga">Ganga</option>
-                                </optgroup>
-                                <optgroup label="Fans">
-                                    <option value="fans-crompton">Crompton</option>
-                                    <option value="fans-havells">Havells</option>
-                                </optgroup>
-                                <optgroup label="Blenders">
-                                    <option value="blenders-prestige">Prestige</option>
-                                    <option value="blenders-panasonic">Panasonic</option>
-                                    <option value="blenders-mexican">Mexican</option>
-                                </optgroup>
-                                <optgroup label="Gas Stove">
-                                    <option value="gas-stove-preethi">Preethi</option>
-                                    <option value="gas-stove-prestige">Prestige</option>
-                                    <option value="gas-stove-ganga">Ganga</option>
-                                    <option value="gas-stove-butterfly">Butterfly</option>
-                                </optgroup>
-                                <optgroup label="Water Filters">
-                                    <option value="water-filters-kent">Kent</option>
-                                    <option value="water-filters-pure-it">Pure It</option>
-                                    <option value="water-filters-aquaguard">Aquaguard</option>
-                                </optgroup>
                             </select>
                         </div>
                         <div class="form-group half">
@@ -203,40 +165,16 @@
                 </div>
             </section>
 
-            <section class="manage-default-section custom-admin-card full-width-card">
-                <h2 style="margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #eee; color: #444;">Live
-                    Storefront (Built-in Products & Categories)</h2>
-                <p style="margin-bottom: 15px; color: #666;">These items are hardcoded into the original store. You
-                    cannot permanently delete them, but you can <strong>Hide</strong> them from appearing on the
-                    customer's page.</p>
 
-                <div class="split-columns">
-                    <!-- Default Categories Column -->
-                    <div style="flex: 1;">
-                        <h3 style="margin-bottom: 15px; color: #d32f2f;">Categories / Brands</h3>
-                        <div id="default-categories-list" class="custom-products-grid">
-                            <!-- JS will load predefined categories here with toggle buttons -->
-                        </div>
-                    </div>
-
-                    <!-- Default Products Column -->
-                    <div style="flex: 1;">
-                        <h3 style="margin-bottom: 15px; color: #d32f2f;">Products</h3>
-                        <div id="default-products-list" class="custom-products-grid">
-                            <!-- JS will load predefined products here with toggle buttons -->
-                        </div>
-                    </div>
-                </div>
-            </section>
         </main>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="db.js?v=2.5"></script>
-    <script src="products-data.js?v=2.5"></script>
-    <script src="admin.js?v=2.5"></script>
-    <script src="chatbot.js?v=2.5"></script>
+    <script src="db.js?v=2.6"></script>
+    <script src="products-data.js?v=2.6"></script>
+    <script src="admin.js?v=2.6"></script>
+    <script src="chatbot.js?v=2.6"></script>
 </body>
 
 </html>
