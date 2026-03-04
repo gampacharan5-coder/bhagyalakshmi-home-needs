@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     window.globalStoreData = { customProducts, hiddenProducts };
 
+    console.log("Global Store Data Loaded:", window.globalStoreData);
+    console.log("PRODUCTS_DATA Loaded?", typeof PRODUCTS_DATA !== 'undefined');
+
     // --- Mobile Menu Toggle ---
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
@@ -51,12 +54,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Data is passed from the parent scope
 
         // Combine permanent and custom products
-        const allItems = [...PRODUCTS_DATA, ...customProducts];
+        const allItems = [...PRODUCTS_DATA, ...(Array.isArray(customProducts) ? customProducts : [])];
+        console.log("Total items to render:", allItems.length);
 
         // 1. Render Premium/Featured Collection
         if (premiumGrid) {
             premiumGrid.innerHTML = '';
             const featured = allItems.filter(p => p.featured && !hiddenProducts.includes(p.title));
+            console.log("Featured items count:", featured.length);
             featured.forEach((p, idx) => {
                 premiumGrid.appendChild(createProductCard(p, idx));
             });
