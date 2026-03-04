@@ -188,6 +188,45 @@ const Database = {
         localStorage.setItem('customStoreSlides', JSON.stringify(slides));
     },
 
+    // Decorative Marquees
+    async getCustomMarquees() {
+        if (useFirebase) {
+            try {
+                const snap = await db.collection("customStoreMarquees").get();
+                return snap.docs.map(doc => doc.data());
+            } catch (e) {
+                console.error("Firebase Error (getCustomMarquees):", e);
+            }
+        }
+        return JSON.parse(localStorage.getItem('customStoreMarquees') || '[]');
+    },
+    async saveCustomMarquee(marquee) {
+        if (useFirebase) {
+            try {
+                await db.collection("customStoreMarquees").doc(marquee.id).set(marquee);
+                return;
+            } catch (e) {
+                console.error("Firebase Error (saveCustomMarquee):", e);
+            }
+        }
+        const marquees = await this.getCustomMarquees();
+        marquees.push(marquee);
+        localStorage.setItem('customStoreMarquees', JSON.stringify(marquees));
+    },
+    async deleteCustomMarquee(id) {
+        if (useFirebase) {
+            try {
+                await db.collection("customStoreMarquees").doc(id).delete();
+                return;
+            } catch (e) {
+                console.error("Firebase Error (deleteCustomMarquee):", e);
+            }
+        }
+        let marquees = await this.getCustomMarquees();
+        marquees = marquees.filter(m => m.id !== id);
+        localStorage.setItem('customStoreMarquees', JSON.stringify(marquees));
+    },
+
     // Settings (Hidden Items & Offer Banner)
     async getSettings() {
         const defaultSettings = {

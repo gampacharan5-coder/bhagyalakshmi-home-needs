@@ -313,5 +313,69 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
 
+    // --- Decorative Marquee Management ---
+    const marqueeForm = document.getElementById('marquee-form');
+    const marqueeImageInput = document.getElementById('marquee-image');
 
+    if (marqueeForm) {
+        marqueeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const file = marqueeImageInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function (event) {
+                const base64Image = event.target.result;
+                const newMarquee = {
+                    id: 'marquee-' + Date.now(),
+                    image: base64Image
+                };
+
+                await Database.saveCustomMarquee(newMarquee);
+
+                const msg = document.getElementById('marquee-msg');
+                msg.style.display = 'block';
+                marqueeForm.reset();
+                await loadCustomMarquees();
+
+                setTimeout(() => msg.style.display = 'none', 3000);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function loadCustomMarquees() {
+        const list = document.getElementById('custom-marquees-list');
+        if (!list) return;
+        list.innerHTML = 'Loading...';
+
+        const marquees = await Database.getCustomMarquees();
+        list.innerHTML = '';
+
+        if (marquees.length === 0) {
+            list.innerHTML = '<p style="color: #777; font-style: italic;">No decorative marquee images yet.</p>';
+            return;
+        }
+
+        marquees.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'custom-product-item';
+            item.innerHTML = `
+                <img src="${m.image}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 4px; background: #f9f9f9; padding: 5px;">
+                <div class="custom-product-info"></div>
+                <button class="delete-btn" onclick="deleteMarquee('${m.id}')">Delete</button>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    window.deleteMarquee = async function (id) {
+        if (confirm("Delete this marquee image?")) {
+            await Database.deleteCustomMarquee(id);
+            await loadCustomMarquees();
+        }
+    };
+
+    await loadCustomMarquees();
 });

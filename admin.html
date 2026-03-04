@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- Using the same core font as index.html -->
-    <link rel="stylesheet" href="admin.css?v=2.6">
+    <link rel="stylesheet" href="admin.css?v=2.7">
 </head>
 
 <body>
@@ -165,16 +165,53 @@
                 </div>
             </section>
 
+            <!-- Marquee Form Section -->
+            <section class="manage-slider-section custom-admin-card full-width-card">
+                <h2 style="margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #eee; color: #444;">
+                    Decorative Sliding Images (Marquee)</h2>
+                <p style="margin-bottom: 15px; color: #666;">Upload small icons or decorative images (like gadgets, home
+                    needs, or logos). These will scroll continuously across the homepage screen.</p>
+
+                <div class="split-columns">
+                    <!-- Current Marquees List -->
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 15px; color: #d32f2f;">Current Marquee Images</h3>
+                        <div id="custom-marquees-list" class="custom-products-grid"
+                            style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- JS will load custom marquees here -->
+                        </div>
+                    </div>
+
+                    <!-- Add New Marquee Form -->
+                    <div style="flex: 1;">
+                        <div class="custom-admin-card" style="margin-top: 0;">
+                            <h3 style="margin-bottom: 15px; color: #d32f2f;">Add New Marquee Image</h3>
+                            <form id="marquee-form">
+                                <div class="form-group">
+                                    <label for="marquee-image">Choose Image</label>
+                                    <input type="file" id="marquee-image" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="submit-btn"
+                                    style="margin-top: 10px; background-color: #d32f2f;">Upload Image</button>
+                                <p id="marquee-msg"
+                                    style="color: green; margin-top: 10px; display: none; font-weight: bold;">
+                                    Marquee Image Added Successfully!</p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
 
         </main>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="db.js?v=2.6"></script>
-    <script src="products-data.js?v=2.6"></script>
-    <script src="admin.js?v=2.6"></script>
-    <script src="chatbot.js?v=2.6"></script>
+    <script src="db.js?v=2.7"></script>
+    <script src="products-data.js?v=2.7"></script>
+    <script src="admin.js?v=2.7"></script>
+    <script src="chatbot.js?v=2.7"></script>
 </body>
 
 </html>

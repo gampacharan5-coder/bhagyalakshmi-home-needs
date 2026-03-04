@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const offerText = settings.storeOfferBannerText || "";
     const customSlides = await Database.getCustomSlides();
     const customCategoriesData = await Database.getCustomCategories();
+    const customMarquees = await Database.getCustomMarquees();
 
     window.globalStoreData = { customProducts, hiddenProducts };
 
@@ -112,14 +113,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // --- Dynamic Hero Slider ---
-    // customSlides already loaded from Database
     if (customSlides.length > 0) {
         const heroSection = document.getElementById('hero');
         const scrollingWrapper = document.querySelector('.scrolling-wrapper');
 
         if (heroSection && scrollingWrapper) {
-            // Hide the old scrolling track
-            scrollingWrapper.style.display = 'none';
+            // WE NO LONGER HIDE THE SCROLLING WRAPPER
+            // because the user wants "decorative sides" on top of the background.
+            // scrollingWrapper.style.display = 'none';
 
             // Create a container for our full-screen fading slides
             const sliderContainer = document.createElement('div');
@@ -134,16 +135,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             heroSection.appendChild(sliderContainer);
 
-            // Setup crossfade interval if more than 1 slide
             if (customSlides.length > 1) {
                 let currentSlide = 0;
                 const slides = sliderContainer.querySelectorAll('.dynamic-hero-slide');
-
                 setInterval(() => {
                     slides[currentSlide].style.opacity = '0';
                     currentSlide = (currentSlide + 1) % slides.length;
                     slides[currentSlide].style.opacity = '1';
-                }, 5000); // Change image every 5 seconds
+                }, 5000);
+            }
+        }
+    }
+
+    // --- Dynamic Decorative Marquee ---
+    if (customMarquees.length > 0) {
+        const scrollingTrack = document.querySelector('.scrolling-track');
+        if (scrollingTrack) {
+            scrollingTrack.innerHTML = '';
+            // Duplicate multiple times to ensure the marquee is filled and loops smoothly
+            const repeatCount = customMarquees.length < 5 ? 4 : 2;
+            for (let i = 0; i < repeatCount; i++) {
+                customMarquees.forEach(m => {
+                    const img = document.createElement('img');
+                    img.src = m.image;
+                    img.className = 'scroll-img';
+                    img.alt = 'Decorative Icon';
+                    scrollingTrack.appendChild(img);
+                });
             }
         }
     }
