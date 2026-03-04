@@ -21,6 +21,46 @@ if (firebaseConfig.apiKey) {
         db = firebase.firestore();
         useFirebase = true;
         console.log("Firebase Database is ACTIVE. Products are syncing globally.");
+
+        // One-time auto-migration from LocalStorage to Firebase
+        setTimeout(async () => {
+            if (localStorage.getItem("migratedToFirebase") !== "true") {
+                console.log("Running one-time data migration from Local Storage to Firebase...");
+
+                // Migrate Products
+                const localProducts = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
+                for (let p of localProducts) {
+                    await db.collection("customStoreProducts").doc(p.id).set(p);
+                }
+
+                // Migrate Categories
+                const localCats = JSON.parse(localStorage.getItem('customStoreCategories') || '[]');
+                for (let c of localCats) {
+                    await db.collection("customStoreCategories").doc(c.id).set(c);
+                }
+
+                // Migrate Slides
+                const localSlides = JSON.parse(localStorage.getItem('customStoreSlides') || '[]');
+                for (let s of localSlides) {
+                    await db.collection("customStoreSlides").doc(s.id).set(s);
+                }
+
+                // Migrate Settings
+                const hiddenProds = JSON.parse(localStorage.getItem('hiddenStoreProducts') || '[]');
+                const hiddenCats = JSON.parse(localStorage.getItem('hiddenStoreCategories') || '[]');
+                const offerText = localStorage.getItem('storeOfferBannerText') || "";
+
+                await db.collection("settings").doc("global").set({
+                    hiddenStoreProducts: hiddenProds,
+                    hiddenStoreCategories: hiddenCats,
+                    storeOfferBannerText: offerText
+                }, { merge: true });
+
+                localStorage.setItem("migratedToFirebase", "true");
+                console.log("Migration Complete! Please refresh the page.");
+            }
+        }, 1500);
+
     } catch (e) {
         console.error("Firebase initialization failed. Check config.", e);
     }
