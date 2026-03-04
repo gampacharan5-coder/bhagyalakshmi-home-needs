@@ -1,5 +1,16 @@
 // Wait for the DOM to fully load before running scripts
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+
+    // --- PRELOAD GLOBAL DATA FROM DATABASE ---
+    const customProducts = await Database.getCustomProducts();
+    const settings = await Database.getSettings();
+    const hiddenProducts = settings.hiddenStoreProducts || [];
+    const hiddenCategories = settings.hiddenStoreCategories || [];
+    const offerText = settings.storeOfferBannerText || "";
+    const customSlides = await Database.getCustomSlides();
+    const customCategoriesData = await Database.getCustomCategories();
+
+    window.globalStoreData = { customProducts, hiddenProducts };
 
     // --- Mobile Menu Toggle ---
     const menuToggle = document.querySelector('.menu-toggle');
@@ -37,9 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const premiumGrid = document.getElementById('premium-products-grid');
         const dynamicContainer = document.getElementById('all-products-dynamic-container');
 
-        const customProducts = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
-        const hiddenProducts = JSON.parse(localStorage.getItem('hiddenStoreProducts') || '[]');
-        const hiddenCategories = JSON.parse(localStorage.getItem('hiddenStoreCategories') || '[]');
+        // Data is passed from the parent scope
 
         // 1. Render Premium/Featured Collection
         if (premiumGrid) {
@@ -73,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 section.style.backgroundColor = '#eef2f5';
 
                 let displayTitle = catId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                const customCat = JSON.parse(localStorage.getItem('customStoreCategories') || '[]').find(c => c.id === catId);
+                const customCat = customCategoriesData.find(c => c.id === catId);
                 if (customCat) displayTitle = customCat.displayName;
 
                 section.innerHTML = `
@@ -98,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Dynamic Hero Slider ---
-    const customSlides = JSON.parse(localStorage.getItem('customStoreSlides') || '[]');
+    // customSlides already loaded from Database
     if (customSlides.length > 0) {
         const scrollingTrack = document.querySelector('.scrolling-track');
         if (scrollingTrack) {
@@ -117,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Dynamic Custom Navigation Categories Loader ---
-    const customCategoriesData = JSON.parse(localStorage.getItem('customStoreCategories') || '[]');
+    // customCategoriesData already loaded from Database
     const mainDropdownContent = document.getElementById('main-dropdown-content');
 
     if (mainDropdownContent) {
@@ -154,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Dynamic Offers Banner ---
-    const offerText = localStorage.getItem('storeOfferBannerText');
+    // offerText already loaded from Database
     if (offerText) {
         const banner = document.createElement('div');
         banner.style.cssText = "background-color: #ff9800; color: #fff; text-align: center; padding: 10px; font-weight: bold; overflow: hidden; white-space: nowrap;";
@@ -213,8 +222,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const customProducts = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
-            const hiddenProducts = JSON.parse(localStorage.getItem('hiddenStoreProducts') || '[]');
+            const customProducts = window.globalStoreData.customProducts;
+            const hiddenProducts = window.globalStoreData.hiddenProducts;
 
             // Combine and filter
             const allItems = [...PRODUCTS_DATA, ...customProducts].filter(p => !hiddenProducts.includes(p.title));

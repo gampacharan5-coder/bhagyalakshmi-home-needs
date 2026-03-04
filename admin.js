@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     const loginModal = document.getElementById('login-modal');
     const dashboard = document.getElementById('admin-dashboard');
@@ -7,11 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMsg = document.getElementById('login-error');
 
     // Super simple auth (since static site)
-    loginBtn.addEventListener('click', () => {
+    loginBtn.addEventListener('click', async () => {
         if (passwordInput.value === 'BLHN@123') {
             loginModal.style.display = 'none';
             dashboard.style.display = 'block';
-            loadCustomProducts();
+            await loadCustomProducts();
         } else {
             errorMsg.style.display = 'block';
         }
@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Convert image to Base64 to save in localStorage
+        // Convert image to Base64 to save
         const reader = new FileReader();
-        reader.onload = function (event) {
+        reader.onload = async function (event) {
             const base64Image = event.target.result;
 
             const catSelect = document.getElementById('prod-category');
@@ -54,34 +54,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 dateAdded: new Date().toISOString()
             };
 
-            saveProduct(newProduct);
+            await saveProduct(newProduct);
         };
         reader.readAsDataURL(file);
     });
 
-    function saveProduct(product) {
-        let products = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
-        products.push(product);
-        localStorage.setItem('customStoreProducts', JSON.stringify(products));
+    async function saveProduct(product) {
+        await Database.saveCustomProduct(product);
 
         const successMsg = document.getElementById('success-msg');
-        successMsg.innerHTML = 'Product added <strong>locally</strong> to this browser! To make it permanent for all users, please contact the developer.';
+        if (window.useFirebase) {
+            successMsg.innerHTML = 'Product added <strong>globally</strong>! All users will see this.';
+        } else {
+            successMsg.innerHTML = 'Product added <strong>locally</strong> to this browser! To make it permanent for all users, please contact the developer or configure Firebase.';
+        }
         successMsg.style.display = 'block';
 
         form.reset();
-        loadCustomProducts();
+        await loadCustomProducts();
 
         setTimeout(() => {
             successMsg.style.display = 'none';
         }, 3000);
     }
 
-    function loadCustomProducts() {
+    async function loadCustomProducts() {
         const list = document.getElementById('custom-products-list');
+        list.innerHTML = 'Loading...';
+
+        let products = await Database.getCustomProducts();
+
         list.innerHTML = '';
-
-        let products = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
-
         if (products.length === 0) {
             list.innerHTML = '<p style="color: #777; font-style: italic;">No custom products added yet.</p>';
             return;
@@ -111,25 +114,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Attach to window so inline onclick can use it
-    window.deleteProduct = function (id) {
+    window.deleteProduct = async function (id) {
         if (confirm("Are you sure you want to completely remove this product?")) {
-            let products = JSON.parse(localStorage.getItem('customStoreProducts') || '[]');
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem('customStoreProducts', JSON.stringify(products));
-            loadCustomProducts();
+            await Database.deleteCustomProduct(id);
+            await loadCustomProducts();
         }
     };
 
     // --- Custom Category / Navigation Menu Logic ---
     const categoryForm = document.getElementById('category-form');
 
-    categoryForm.addEventListener('submit', (e) => {
+    categoryForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const menuName = document.getElementById('new-menu-name').value.trim();
         const brandName = document.getElementById('new-brand-name').value.trim();
 
-        // Slugify the names to create a safe ID (e.g., "Mixers" + "Bajaj" = "mixers-bajaj")
         const menuSlug = menuName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const brandSlug = brandName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const categoryId = `${menuSlug}-${brandSlug}`;
@@ -142,49 +142,40 @@ document.addEventListener('DOMContentLoaded', () => {
             dateAdded: new Date().toISOString()
         };
 
-        let categories = JSON.parse(localStorage.getItem('customStoreCategories') || '[]');
-        // Avoid exact duplicates
-        if (!categories.find(c => c.id === newCategory.id)) {
-            categories.push(newCategory);
-            localStorage.setItem('customStoreCategories', JSON.stringify(categories));
-        }
+        await Database.saveCustomCategory(newCategory);
 
         const catSuccessMsg = document.getElementById('cat-success-msg');
         catSuccessMsg.style.display = 'block';
         categoryForm.reset();
 
-        loadCustomCategories();
+        await loadCustomCategories();
 
         setTimeout(() => {
             catSuccessMsg.style.display = 'none';
         }, 3000);
     });
 
-    function loadCustomCategories() {
-        // Load into the custom categories management list
+    async function loadCustomCategories() {
         const catList = document.getElementById('custom-categories-list');
-        catList.innerHTML = '';
+        catList.innerHTML = 'Loading...';
 
-        // Load into the Product dropdown Select
         const prodCategorySelect = document.getElementById('prod-category');
-        // Remove previously added custom optgroups if any, so we can re-render cleanly
         Array.from(prodCategorySelect.querySelectorAll('.custom-optgroup')).forEach(el => el.remove());
 
-        let categories = JSON.parse(localStorage.getItem('customStoreCategories') || '[]');
+        let categories = await Database.getCustomCategories();
 
+        catList.innerHTML = '';
         if (categories.length === 0) {
             catList.innerHTML = '<p style="color: #777; font-style: italic;">No custom menus added yet.</p>';
             return;
         }
 
-        // Group categories by their Main Menu for the dropdown
         const groupedCategories = {};
         categories.forEach(c => {
             if (!groupedCategories[c.menuName]) groupedCategories[c.menuName] = [];
             groupedCategories[c.menuName].push(c);
         });
 
-        // Add them to the Dropdown
         for (const [menuName, cats] of Object.entries(groupedCategories)) {
             const optGroup = document.createElement('optgroup');
             optGroup.label = menuName + " (Custom)";
@@ -194,13 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const opt = document.createElement('option');
                 opt.value = c.id;
                 opt.textContent = c.brandName;
-                opt.dataset.displayName = c.displayName; // Save full display name so the product saving logic can extract it
+                opt.dataset.displayName = c.displayName;
                 optGroup.appendChild(opt);
             });
             prodCategorySelect.appendChild(optGroup);
         }
 
-        // Add them to the Management List UI
         categories.forEach(c => {
             const item = document.createElement('div');
             item.className = 'custom-product-item';
@@ -216,17 +206,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.deleteCategory = function (id) {
+    window.deleteCategory = async function (id) {
         if (confirm("Remove this custom menu? Products assigned to it won't be deleted, but they might not show up correctly until you reassign them.")) {
-            let categories = JSON.parse(localStorage.getItem('customStoreCategories') || '[]');
-            categories = categories.filter(c => c.id !== id);
-            localStorage.setItem('customStoreCategories', JSON.stringify(categories));
-            loadCustomCategories();
+            await Database.deleteCustomCategory(id);
+            await loadCustomCategories();
         }
     };
 
-    // Load custom categories on startup
-    loadCustomCategories();
+    await loadCustomCategories();
 
     // --- Hero Slider Management ---
     const sliderForm = document.getElementById('slider-form');
@@ -239,31 +226,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = function (event) {
+        reader.onload = async function (event) {
             const base64Image = event.target.result;
             const newSlide = {
                 id: 'slide-' + Date.now(),
                 image: base64Image
             };
 
-            let slides = JSON.parse(localStorage.getItem('customStoreSlides') || '[]');
-            slides.push(newSlide);
-            localStorage.setItem('customStoreSlides', JSON.stringify(slides));
+            await Database.saveCustomSlide(newSlide);
 
             const msg = document.getElementById('slide-msg');
             msg.style.display = 'block';
             sliderForm.reset();
-            loadCustomSlides();
+            await loadCustomSlides();
 
             setTimeout(() => msg.style.display = 'none', 3000);
         };
         reader.readAsDataURL(file);
     });
 
-    function loadCustomSlides() {
+    async function loadCustomSlides() {
         const list = document.getElementById('custom-slides-list');
+        list.innerHTML = 'Loading...';
+
+        const slides = await Database.getCustomSlides();
         list.innerHTML = '';
-        const slides = JSON.parse(localStorage.getItem('customStoreSlides') || '[]');
 
         if (slides.length === 0) {
             list.innerHTML = '<p style="color: #777; font-style: italic;">No custom hero slides.</p>';
@@ -282,36 +269,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.deleteSlide = function (id) {
+    window.deleteSlide = async function (id) {
         if (confirm("Delete this hero slide?")) {
-            let slides = JSON.parse(localStorage.getItem('customStoreSlides') || '[]');
-            slides = slides.filter(s => s.id !== id);
-            localStorage.setItem('customStoreSlides', JSON.stringify(slides));
-            loadCustomSlides();
+            await Database.deleteCustomSlide(id);
+            await loadCustomSlides();
         }
     };
-    loadCustomSlides();
+    await loadCustomSlides();
 
     // --- Special Offers Banner Management ---
     const offerForm = document.getElementById('offer-banner-form');
     const offerInput = document.getElementById('offer-text');
 
-    // Pre-fill if exists
-    offerInput.value = localStorage.getItem('storeOfferBannerText') || '';
+    const settings = await Database.getSettings();
+    offerInput.value = settings.storeOfferBannerText || '';
 
-    offerForm.addEventListener('submit', (e) => {
+    offerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        localStorage.setItem('storeOfferBannerText', offerInput.value.trim());
+        await Database.saveSetting('storeOfferBannerText', offerInput.value.trim());
 
         const msg = document.getElementById('banner-msg');
-        msg.textContent = 'Banner updated automatically!';
+        msg.textContent = 'Banner updated ' + (window.useFirebase ? 'globally' : 'locally') + '!';
         msg.style.color = 'green';
         msg.style.display = 'block';
         setTimeout(() => msg.style.display = 'none', 3000);
     });
 
-    document.getElementById('clear-banner-btn').addEventListener('click', () => {
-        localStorage.removeItem('storeOfferBannerText');
+    document.getElementById('clear-banner-btn').addEventListener('click', async () => {
+        await Database.saveSetting('storeOfferBannerText', "");
         offerInput.value = '';
 
         const msg = document.getElementById('banner-msg');
@@ -323,56 +308,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Default / Live Storefront Item Management ---
     const defaultCategoriesList = [
-        // Mixers
         { id: 'mixers-preethi', name: 'Mixers > Preethi' },
         { id: 'mixers-prestige', name: 'Mixers > Prestige' },
         { id: 'mixers-ultra', name: 'Mixers > Ultra' },
         { id: 'mixers-ganga', name: 'Mixers > Ganga' },
         { id: 'mixers-electron', name: 'Mixers > Electron' },
-
-        // Grinders
         { id: 'grinders-ultra', name: 'Grinders > Ultra' },
         { id: 'grinders-prestige', name: 'Grinders > Prestige' },
         { id: 'grinders-preethi', name: 'Grinders > Preethi' },
         { id: 'grinders-lakshmi', name: 'Grinders > Lakshmi' },
-
-        // Cookers
         { id: 'cookers-prestige', name: 'Cookers > Prestige' },
         { id: 'cookers-butterfly', name: 'Cookers > Butterfly' },
         { id: 'cookers-ganga', name: 'Cookers > Ganga' },
-
-        // Fans
         { id: 'fans-crompton', name: 'Fans > Crompton' },
         { id: 'fans-havells', name: 'Fans > Havells' },
-
-        // Blenders
         { id: 'blenders-prestige', name: 'Blenders > Prestige' },
         { id: 'blenders-panasonic', name: 'Blenders > Panasonic' },
         { id: 'blenders-mexican', name: 'Blenders > Mexican' },
-
-        // Gas Stoves
         { id: 'gas-stove-preethi', name: 'Gas Stoves > Preethi' },
         { id: 'gas-stove-prestige', name: 'Gas Stoves > Prestige' },
         { id: 'gas-stove-ganga', name: 'Gas Stoves > Ganga' },
         { id: 'gas-stove-butterfly', name: 'Gas Stoves > Butterfly' },
-
-        // Water Filters
         { id: 'water-filters-kent', name: 'Water Filters > Kent' },
         { id: 'water-filters-pure-it', name: 'Water Filters > Pure It' },
         { id: 'water-filters-aquaguard', name: 'Water Filters > Aquaguard' },
-
-        // Misc
         { id: 'induction-cooktops', name: 'Induction Cooktops' }
     ];
 
-    // Link to our centralized products data
     const defaultProductsList = (typeof PRODUCTS_DATA !== 'undefined') ?
         PRODUCTS_DATA.map(p => ({ name: p.title, identifyTerm: p.title })) : [];
 
-    function renderDefaultItemsToggleList(itemsArray, containerId, storageKey, type) {
+    async function renderDefaultItemsToggleList(itemsArray, containerId, storageKey) {
         const container = document.getElementById(containerId);
+        container.innerHTML = 'Loading...';
+
+        const settings = await Database.getSettings();
+        const hiddenItems = settings[storageKey] || [];
         container.innerHTML = '';
-        const hiddenItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
 
         itemsArray.forEach(item => {
             const isHidden = hiddenItems.includes(item.id || item.identifyTerm);
@@ -393,25 +365,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.toggleDefaultVisibility = function (identifier, storageKey) {
-        let hiddenItems = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    window.toggleDefaultVisibility = async function (identifier, storageKey) {
+        const settings = await Database.getSettings();
+        let hiddenItems = settings[storageKey] || [];
 
         if (hiddenItems.includes(identifier)) {
-            // It's hidden, so show it
             hiddenItems = hiddenItems.filter(id => id !== identifier);
         } else {
-            // It's visible, so hide it
             hiddenItems.push(identifier);
         }
 
-        localStorage.setItem(storageKey, JSON.stringify(hiddenItems));
+        await Database.saveSetting(storageKey, hiddenItems);
 
-        // Re-render both lists just to be safe
-        renderDefaultItemsToggleList(defaultCategoriesList, 'default-categories-list', 'hiddenStoreCategories', 'category');
-        renderDefaultItemsToggleList(defaultProductsList, 'default-products-list', 'hiddenStoreProducts', 'product');
+        await renderDefaultItemsToggleList(defaultCategoriesList, 'default-categories-list', 'hiddenStoreCategories');
+        await renderDefaultItemsToggleList(defaultProductsList, 'default-products-list', 'hiddenStoreProducts');
     };
 
-    renderDefaultItemsToggleList(defaultCategoriesList, 'default-categories-list', 'hiddenStoreCategories', 'category');
-    renderDefaultItemsToggleList(defaultProductsList, 'default-products-list', 'hiddenStoreProducts', 'product');
+    await renderDefaultItemsToggleList(defaultCategoriesList, 'default-categories-list', 'hiddenStoreCategories');
+    await renderDefaultItemsToggleList(defaultProductsList, 'default-products-list', 'hiddenStoreProducts');
 
 });
