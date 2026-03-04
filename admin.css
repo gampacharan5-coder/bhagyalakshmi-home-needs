@@ -148,6 +148,7 @@ body {
     flex-direction: column;
     height: 100%;
     /* Ensure it spans the grid cell height */
+    min-height: 0;
 }
 
 .form-group {
@@ -217,7 +218,8 @@ body {
 
 /* Custom Products List */
 .custom-products-grid {
-    flex-grow: 1;
+    flex: 1 1 0;
+    /* Important: basis 0 forces it to not expand beyond parent and enables scrolling */
     min-height: 200px;
     overflow-y: auto;
     padding: 10px;
