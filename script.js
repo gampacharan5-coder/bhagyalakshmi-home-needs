@@ -28,9 +28,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // --- Unified Rendering Engine ---
     function createProductCard(p, index) {
-        let priceHtml = `₹${p.price}`;
-        if (p.origPrice) {
-            priceHtml = `<del style="color:#999; font-size:0.85em; margin-right:6px;">₹${p.origPrice}</del> <span class="current-price">₹${p.price}</span>`;
+        let priceHtml = `₹${p.origPrice || p.price || 0}`;
+        if (p.offerPrice) {
+            priceHtml = `<del style="color:#999; font-size:0.85em; margin-right:6px;">₹${p.origPrice}</del> <span class="current-price">₹${p.offerPrice}</span>`;
+        } else if (p.price) {
+            // Fallback for older data if it exists
+            priceHtml = `<span class="current-price">₹${p.price}</span>`;
         }
 
         const card = document.createElement('div');
@@ -355,11 +358,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                     itemDiv.href = (isAllProd ? '' : 'all-products.html') + '#' + anchorId;
                     itemDiv.className = 'search-result-item';
 
+                    const displayPrice = p.offerPrice || p.origPrice || p.price || 0;
                     itemDiv.innerHTML = `
                         <img src="${p.image}" class="search-result-img" alt="${p.title}" onerror="this.src='mixer.png'">
                         <div class="search-result-info">
                             <span class="search-result-title">${p.title}</span>
-                            <span class="search-result-price">₹${p.price}</span>
+                            <span class="search-result-price">₹${displayPrice}</span>
                         </div>
                     `;
                     dropdown.appendChild(itemDiv);
