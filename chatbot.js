@@ -294,10 +294,28 @@ const initChatbot = () => {
     });
 };
 
-// Robust initialization
+// Robust initialization with Database check
+const startChatbot = async () => {
+    try {
+        // Fetch global settings to check if chatbot is enabled
+        // Database is available from db.js (loaded before script.js/chatbot.js)
+        const settings = await window.Database.getSettings();
+
+        if (settings.chatbotEnabled !== false) {
+            initChatbot();
+        } else {
+            console.log("AI Chatbot is disabled by Administrator.");
+        }
+    } catch (e) {
+        // Fallback to enabled if database error
+        console.warn("Could not fetch chatbot settings, defaulting to enabled:", e);
+        initChatbot();
+    }
+};
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initChatbot);
+    document.addEventListener('DOMContentLoaded', startChatbot);
 } else {
-    initChatbot();
+    startChatbot();
 }
 

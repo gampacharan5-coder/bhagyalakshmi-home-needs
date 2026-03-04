@@ -506,4 +506,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (new URLSearchParams(window.location.search).get('migrate') === '1') {
         if (confirm("Run PDF Product Migration for Pigeon?")) migratePDFData();
     }
+
+    // --- Chatbot Enable/Disable Logic ---
+    const chatbotToggle = document.getElementById('chatbot-enabled-toggle');
+    if (chatbotToggle) {
+        // Load initial state
+        const adminSettings = await Database.getSettings();
+        chatbotToggle.checked = adminSettings.chatbotEnabled !== false; // Default to true
+
+        chatbotToggle.addEventListener('change', async () => {
+            const isEnabled = chatbotToggle.checked;
+            await Database.saveSetting('chatbotEnabled', isEnabled);
+
+            const msg = document.getElementById('chatbot-toggle-msg');
+            msg.textContent = 'Chatbot ' + (isEnabled ? 'ENABLED' : 'DISABLED') + ' globally!';
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        });
+    }
 });
