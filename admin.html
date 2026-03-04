@@ -212,15 +212,21 @@
                 <p style="margin-bottom: 15px; color: #666;">Enable or disable the AI chatbot for all website visitors.
                 </p>
 
-                <div
-                    style="display: flex; align-items: center; gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 8px; border: 1px solid #eee;">
-                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center; gap: 10px;">
-                        <input type="checkbox" id="chatbot-enabled-toggle"
-                            style="width: 25px; height: 25px; cursor: pointer;">
-                        <label for="chatbot-enabled-toggle"
-                            style="margin-bottom: 0; font-size: 1.1em; font-weight: 600; cursor: pointer;">Enable AI
-                            Chatbot on Website</label>
+                <div style="background: #f9f9f9; padding: 25px; border-radius: 8px; border: 1px solid #eee;">
+                    <div class="form-group" style="display: flex; gap: 30px; margin-bottom: 20px;">
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600;">
+                            <input type="radio" name="chatbot-status" id="chatbot-enable" value="true"
+                                style="width: 20px; height: 20px;"> Enable Chatbot
+                        </label>
+                        <label
+                            style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600;">
+                            <input type="radio" name="chatbot-status" id="chatbot-disable" value="false"
+                                style="width: 20px; height: 20px;"> Disable Chatbot
+                        </label>
                     </div>
+                    <button id="apply-chatbot-settings" class="submit-btn"
+                        style="width: 200px; background-color: #4CAF50;">Apply Settings</button>
                 </div>
                 <p id="chatbot-toggle-msg" style="color: green; margin-top: 10px; display: none; font-weight: bold;">
                     Chatbot settings saved successfully!</p>
