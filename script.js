@@ -50,10 +50,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Data is passed from the parent scope
 
+        // Combine permanent and custom products
+        const allItems = [...PRODUCTS_DATA, ...customProducts];
+
         // 1. Render Premium/Featured Collection
         if (premiumGrid) {
             premiumGrid.innerHTML = '';
-            const featured = PRODUCTS_DATA.filter(p => p.featured && !hiddenProducts.includes(p.title));
+            const featured = allItems.filter(p => p.featured && !hiddenProducts.includes(p.title));
             featured.forEach((p, idx) => {
                 premiumGrid.appendChild(createProductCard(p, idx));
             });
@@ -62,9 +65,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 2. Render All Products Page Content
         if (dynamicContainer) {
             dynamicContainer.innerHTML = '';
-
-            // Combine permanent and custom products
-            const allItems = [...PRODUCTS_DATA, ...customProducts];
 
             // Group by category
             const categories = {};

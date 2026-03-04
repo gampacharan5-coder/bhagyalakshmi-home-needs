@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 origPrice: document.getElementById('prod-orig-price').value,
                 offerPrice: document.getElementById('prod-offer-price').value,
                 desc: document.getElementById('prod-desc').value,
+                featured: document.getElementById('prod-featured').checked,
                 dateAdded: new Date().toISOString()
             };
 
@@ -100,10 +101,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 priceHtml = `<del style="color:#999; margin-right:5px;">₹${p.origPrice}</del> ₹${p.offerPrice}`;
             }
 
+            let badgesHtml = '';
+            if (p.featured) {
+                badgesHtml = '<span style="background: #2196F3; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-left: 10px;">PREMIUM</span>';
+            }
+
             item.innerHTML = `
                 <img src="${p.image}" alt="${p.title}">
                 <div class="custom-product-info">
-                    <h4>${p.title}</h4>
+                    <h4>${p.title} ${badgesHtml}</h4>
                     <p>Category: <strong>${p.category}</strong></p>
                     <p>Price: ${priceHtml}</p>
                 </div>
