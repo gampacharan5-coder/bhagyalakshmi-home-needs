@@ -114,18 +114,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     // --- Dynamic Hero Slider ---
     // customSlides already loaded from Database
     if (customSlides.length > 0) {
-        const scrollingTrack = document.querySelector('.scrolling-track');
-        if (scrollingTrack) {
-            scrollingTrack.innerHTML = '';
-            for (let i = 0; i < 2; i++) {
-                customSlides.forEach(slide => {
-                    const img = document.createElement('img');
-                    img.src = slide.image;
-                    img.className = 'scroll-img';
-                    img.alt = 'Custom Hero Slide';
-                    img.style.objectFit = 'cover';
-                    scrollingTrack.appendChild(img);
-                });
+        const heroSection = document.getElementById('hero');
+        const scrollingWrapper = document.querySelector('.scrolling-wrapper');
+
+        if (heroSection && scrollingWrapper) {
+            // Hide the old scrolling track
+            scrollingWrapper.style.display = 'none';
+
+            // Create a container for our full-screen fading slides
+            const sliderContainer = document.createElement('div');
+            sliderContainer.style.cssText = "position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden;";
+
+            customSlides.forEach((slide, idx) => {
+                const slideBg = document.createElement('div');
+                slideBg.style.cssText = `position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('${slide.image}'); background-size: cover; background-position: center; opacity: ${idx === 0 ? 1 : 0}; transition: opacity 2s ease-in-out;`;
+                slideBg.className = 'dynamic-hero-slide';
+                sliderContainer.appendChild(slideBg);
+            });
+
+            heroSection.appendChild(sliderContainer);
+
+            // Setup crossfade interval if more than 1 slide
+            if (customSlides.length > 1) {
+                let currentSlide = 0;
+                const slides = sliderContainer.querySelectorAll('.dynamic-hero-slide');
+
+                setInterval(() => {
+                    slides[currentSlide].style.opacity = '0';
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].style.opacity = '1';
+                }, 5000); // Change image every 5 seconds
             }
         }
     }
