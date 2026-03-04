@@ -119,11 +119,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Group categories by menuName
+        // Group categories by menuName and De-duplicate brand names
         const grouped = {};
         customCategoriesData.forEach(cat => {
             if (!grouped[cat.menuName]) grouped[cat.menuName] = [];
-            grouped[cat.menuName].push(cat);
+
+            // Only add if this brand isn't already in this menu group
+            if (!grouped[cat.menuName].some(existing => existing.brandName === cat.brandName)) {
+                grouped[cat.menuName].push(cat);
+            }
         });
 
         // Create submenus
@@ -142,27 +146,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             submenu.innerHTML = submenuHtml;
             menuContainer.appendChild(submenu);
         }
-
-        // Re-attach event listeners for the newly created submenus (for mobile)
-        const subMenuTitles = menuContainer.querySelectorAll('.dropdown-submenu-title');
-        subMenuTitles.forEach(title => {
-            title.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const submenuContent = title.nextElementSibling;
-                    if (submenuContent) {
-                        const parent = title.closest('.dropdown-content');
-                        if (parent) {
-                            parent.querySelectorAll('.dropdown-submenu-content.mobile-open').forEach(sub => {
-                                if (sub !== submenuContent) sub.classList.remove('mobile-open');
-                            });
-                        }
-                        submenuContent.classList.toggle('mobile-open');
-                    }
-                }
-            });
-        });
     }
 
     if (typeof PRODUCTS_DATA !== 'undefined') {
