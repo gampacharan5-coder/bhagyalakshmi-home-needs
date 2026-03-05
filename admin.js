@@ -127,6 +127,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             list.appendChild(item);
         });
+
+        // Re-apply current search filter if the search box has text
+        const searchInput = document.getElementById('search-custom-products');
+        if (searchInput && searchInput.value) {
+            searchInput.dispatchEvent(new Event('input'));
+        }
+    }
+
+    // Custom Products Search Listener
+    const searchCustomProducts = document.getElementById('search-custom-products');
+    if (searchCustomProducts) {
+        searchCustomProducts.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const productItems = document.querySelectorAll('#custom-products-list .custom-product-item');
+
+            productItems.forEach(item => {
+                const title = item.querySelector('h4').textContent.toLowerCase();
+                const category = item.querySelector('p:nth-of-type(1)').textContent.toLowerCase();
+
+                if (title.includes(searchTerm) || category.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
     }
 
     // --- Product Edit Logic ---
